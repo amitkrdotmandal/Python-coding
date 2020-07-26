@@ -1,0 +1,35 @@
+import imaplib
+import email
+"""host='mailstore.iitd.ernet.in'
+username='ttz188223@iitd.ac.in'
+password='TTZ9614864512'
+port = 993"""
+
+host='imap.gmail.com'
+username='amitkrdotmandal@gmail.com'
+password='maa9614864512'
+#mail=imaplib.IMAP4_SSL(host, 993) ##########for iit still not working
+mail=imaplib.IMAP4_SSL(host)
+mail.login(username, password)
+mail.select("inbox")
+
+_,search_data=mail.search(None,'UNSEEN')
+
+for num in search_data[0].split():
+    #print(num)
+    _,data=mail.fetch(num,'(RFC822)')
+    #print(data)
+    _,b=data[0]
+    email_msg=email.message_from_bytes(b)
+    for header in ['subject','to','from','date']:
+        print("{}:{}".format(header,email_msg[header]))
+    for part in email_msg.walk():
+        if part.get_content_type()=="text/plain":
+            body=part.get_payload(decode=True)
+            print(body.decode())
+        elif part.get_content_type() == "text/html":
+            htmlbody = part.get_payload(decode=True)
+            print(htmlbody.decode())
+            print('\r\n\r\n\r\n')
+
+
